@@ -1,0 +1,8 @@
+# Reviewers auto-requested on PRs. Later rules override earlier ones.
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+*                   @knicolosi313
+
+# Examples once ownership splits up:
+# /frontend/        @RIT-AI-Club/frontend
+# /docs/adr/        @knicolosi313

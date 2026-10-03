@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Lint, type-check, test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Lint
+        run: uv run ruff check --output-format=github
+
+      - name: Format
+        run: uv run ruff format --check
+
+      - name: Type-check
+        run: uv run mypy
+
+      - name: Test
+        # Exit code 5 = "no tests collected"; allowed only until the first test exists.
+        run: uv run pytest -m "not integration" --cov --cov-report=term || [ $? -eq 5 ]
+
+      - name: Secret scan
+        # Via pre-commit: gitleaks-action requires a license key for org-owned repos.
+        run: uv run pre-commit run gitleaks --all-files
