@@ -11,3 +11,5 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Project scaffolding: tooling (uv, ruff, mypy, pytest, pre-commit), CI, contribution
   standards, and documentation structure.
+- `MCPClient`: connects to multiple MCP servers (stdio or Streamable HTTP), merges their tools,
+  and routes tool calls. Servers are configured in `config/mcp_servers.yaml`.

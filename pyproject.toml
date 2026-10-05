@@ -12,7 +12,11 @@ classifiers = [
     "Typing :: Typed",
 ]
 # Runtime dependencies. Add with `uv add <package>`; never edit uv.lock by hand.
-dependencies = []
+dependencies = [
+    "mcp>=2.3.0",
+    "pydantic>=2.13.5",
+    "pyyaml>=6.0.3",
+]
 
 [project.urls]
 Repository = "https://github.com/RIT-AI-Club/Stock-Analysis"
@@ -26,6 +30,7 @@ dev = [
     "pytest-asyncio",
     "pytest-cov",
     "ruff",
+    "types-pyyaml>=6.0.12.20260906",
 ]
 
 [build-system]
