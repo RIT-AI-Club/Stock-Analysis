@@ -26,7 +26,8 @@ flowchart LR
 
 | Component | Location | Responsibility |
 |---|---|---|
-| | | |
+| MCP client | `src/stock_analysis/backend/mcp_client.py` | Connects to every configured MCP server, merges their tools into one set, and routes tool calls to the owning server. Contains no LLM logic. See [ADR 0003](adr/0003-mcp-client-design.md). |
+| MCP config | `src/stock_analysis/backend/mcp_config.py`, `config/mcp_servers.yaml` | Declares and validates the servers to connect to. `${VAR}` references pull secrets from the environment. |
 
 ## Data flow
 

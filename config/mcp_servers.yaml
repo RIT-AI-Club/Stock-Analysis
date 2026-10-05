@@ -1,0 +1,26 @@
+# MCP servers the client connects to. Loaded by stock_analysis.backend.mcp_config.
+#
+# Each entry under `servers` declares one server; its key appears in logs and errors.
+# Use ${VAR} to pull secrets from the environment. Never put API keys in this file.
+# Servers only inherit a minimal set of environment variables, so list every key a server
+# needs under `env`.
+#
+# Local server, launched as a subprocess:
+#
+#   research:
+#     transport: stdio
+#     command: uv
+#     args: [run, python, -m, stock_analysis.servers.research]
+#     env:
+#       PERPLEXITY_API_KEY: ${PERPLEXITY_API_KEY}
+#
+# Remote server over Streamable HTTP:
+#
+#   remote:
+#     transport: http
+#     url: https://example.com/mcp
+
+# Max seconds to wait for any single server response.
+timeout_seconds: 120
+
+servers: {}
