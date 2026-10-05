@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 Guidance for AI coding assistants working in this repo. Human-facing standards live in
 [CONTRIBUTING.md](CONTRIBUTING.md). Follow them; this file only summarizes.
