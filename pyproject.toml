@@ -12,7 +12,10 @@ classifiers = [
     "Typing :: Typed",
 ]
 # Runtime dependencies. Add with `uv add <package>`; never edit uv.lock by hand.
-dependencies = []
+dependencies = [
+    "mcp>=2.3.0",
+    "openai>=3.46.0",
+]
 
 [project.urls]
 Repository = "https://github.com/RIT-AI-Club/Stock-Analysis"
