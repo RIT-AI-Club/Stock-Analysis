@@ -35,7 +35,13 @@ uv run ruff check && uv run ruff format --check && uv run mypy && uv run pytest
 
 ## Running the MCP server
 
-Set `OPENAI_API_KEY` in `.env`, then:
+Set `OPENAI_API_KEY` in `.env` and install the PDF browser once (about 150 MB):
+
+```bash
+uv run playwright install chromium
+```
+
+Then:
 
 ```bash
 uv run --env-file .env python -m stock_analysis.mcp_server   # stdio transport
@@ -47,8 +53,12 @@ Register it in an MCP client, for example Claude Code:
 claude mcp add stock-analysis -- uv run --env-file .env --directory <repo path> python -m stock_analysis.mcp_server
 ```
 
-Tools: `format_report(content, title?, instructions?)` formats raw report content as an HTML
-document. Only presentation changes; facts and figures are kept.
+Tools: `format_report(content, title?, instructions?, charts?)` formats raw report content as a
+print-ready A4 HTML document whose design the model chooses for each report. Only presentation changes; facts and figures are kept.
+`charts` is a list of `{id, title, description}` references to charts produced elsewhere; the
+report gets one empty slot per chart (`data-chart-id="<id>"`) where the chart is inserted later. It also renders a PDF copy and
+saves both to `output/html/` and `output/pdf/` (gitignored; override with `HTML_OUTPUT_DIR` and
+`PDF_OUTPUT_DIR`). The tool still returns the HTML.
 
 ## Project structure
 
@@ -56,7 +66,8 @@ document. Only presentation changes; facts and figures are kept.
 src/stock_analysis/   Application package
   config.py           Settings from env vars
   llm/                LLM interface + OpenAI implementation
-  reporting/          Report formatting logic (core)
+  reporting/          Report formatting, PDF conversion, output saving (core)
+    prompts/          System prompt for the model
   mcp_server/         MCP server (thin wrapper over core modules)
 tests/                Tests (mirrors src/ layout)
 docs/                 Architecture docs and decision records (docs/adr/)

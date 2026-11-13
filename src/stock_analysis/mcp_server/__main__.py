@@ -5,7 +5,7 @@ import logging
 from stock_analysis.config import Settings
 from stock_analysis.llm import OpenAIClient
 from stock_analysis.mcp_server.server import create_server
-from stock_analysis.reporting import ReportFormatter
+from stock_analysis.reporting import PlaywrightPdfConverter, ReportFormatter, ReportStore
 
 
 def main() -> None:
@@ -14,8 +14,13 @@ def main() -> None:
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
     )
-    llm = OpenAIClient.from_settings(Settings.from_env())
-    server = create_server(ReportFormatter(llm))
+    settings = Settings.from_env()
+    formatter = ReportFormatter(
+        OpenAIClient.from_settings(settings),
+        PlaywrightPdfConverter(),
+        ReportStore(settings.html_output_dir, settings.pdf_output_dir),
+    )
+    server = create_server(formatter)
     server.run()
 
 

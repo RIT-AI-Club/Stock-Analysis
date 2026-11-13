@@ -2,7 +2,7 @@
 
 from mcp.server.mcpserver import MCPServer
 
-from stock_analysis.reporting import ReportFormatter
+from stock_analysis.reporting import ChartReference, ReportFormatter
 
 
 def create_server(formatter: ReportFormatter) -> MCPServer:
@@ -21,16 +21,21 @@ def create_server(formatter: ReportFormatter) -> MCPServer:
         content: str,
         title: str | None = None,
         instructions: str | None = None,
+        charts: list[ChartReference] | None = None,
     ) -> str:
-        """Format raw report content into a structured, readable HTML report.
+        """Format raw report content into a styled, print-ready HTML report (PDF saved too).
 
         Only presentation changes; facts and figures are preserved.
 
         Args:
             content: The raw report content to format.
-            title: Optional title to place at the top of the report.
+            title: Optional report title.
             instructions: Optional extra formatting instructions (e.g. section order).
+            charts: Charts produced elsewhere, given as references. The report gets one empty
+                slot per chart (identified by the chart id) where the chart is later inserted.
         """
-        return await formatter.format_report(content, title=title, instructions=instructions)
+        return await formatter.format_report(
+            content, title=title, instructions=instructions, charts=charts or ()
+        )
 
     return server

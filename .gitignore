@@ -50,3 +50,6 @@ desktop.ini
 
 # ---- Claude Code (personal settings only) --------------------------------
 .claude/settings.local.json
+
+# ---- Generated report output (testing) -----------------------------------
+output/

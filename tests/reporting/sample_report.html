@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sample report</title>
+<style>
+/* Reference output: a known-good, contract-compliant report document (made-up data). */
+
+:root {
+  --navy: #0a1a35;
+  --navy-2: #0f2a52;
+  --ink: #14181f;
+  --muted: #5b6472;
+  --faint: #8b94a3;
+  --rule: #e3e6ea;
+  --card: #faf9f7;
+  --blue: #2a78d6;
+  --blue-soft: #eaf1fc;
+  --pos: #0b7a2c;
+  --neg: #c8323a;
+  --font: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+@page { size: A4; margin: 0; }
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  font-size: 9.6pt;
+  line-height: 1.5;
+  color: var(--ink);
+  background: #fff;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+p { margin: 0 0 3mm; }
+strong { font-weight: 700; }
+a { color: var(--blue); text-decoration: none; }
+
+.pos { color: var(--pos); }
+.neg { color: var(--neg); }
+.muted { color: var(--muted); }
+
+/* ---------- Pages ---------- */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  width: 210mm;
+  min-height: 297mm;
+  padding: 13mm 16mm 10mm;
+  background: #fff;
+  break-after: page;
+}
+.page:last-child { break-after: auto; }
+
+.page-head {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 6mm;
+  padding-bottom: 3mm;
+  border-bottom: 0.25mm solid var(--rule);
+  font-size: 7pt;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.page-head b { color: var(--ink); letter-spacing: 0.16em; }
+.page-head span:last-child { text-align: right; }
+
+.page-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 3mm;
+  border-top: 0.25mm solid var(--rule);
+  font-size: 7pt;
+  color: var(--faint);
+}
+.page-foot .pageno { font-weight: 700; color: var(--ink); letter-spacing: 0.08em; }
+
+.page > .page-head + * { margin-top: 6mm; }
+.page > :nth-last-child(2) { margin-bottom: 6mm; }
+
+/* ---------- Cover ---------- */
+
+.page--cover {
+  padding: 15mm 16mm 11mm;
+  color: #fff;
+  background:
+    radial-gradient(120mm 80mm at 85% 0%, rgba(42, 120, 214, 0.35), transparent 70%),
+    linear-gradient(165deg, var(--navy) 0%, #0b2142 100%);
+}
+.cover-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 7.5pt;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #cfe0f7;
+}
+.cover-top .label::before {
+  content: "";
+  display: inline-block;
+  width: 8mm;
+  height: 0.7mm;
+  margin-right: 3mm;
+  vertical-align: middle;
+  background: #6aa9ff;
+}
+.cover-ticker {
+  margin: 20mm 0 0;
+  font-size: 92pt;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.cover-name { margin: 2mm 0 0; font-size: 21pt; font-weight: 300; color: #d4deec; }
+.cover-name span { color: #8794a8; }
+.cover-headline { margin: 14mm 0 3mm; font-size: 20pt; font-weight: 700; letter-spacing: -0.01em; }
+.cover-lede { max-width: 150mm; margin: 0; font-size: 11pt; line-height: 1.55; color: #c3cddc; }
+.page--cover .figure { margin-top: 12mm; }
+.page--cover .fig-label { color: #8fb8ee; }
+.page--cover .fig-title { color: #fff; }
+.page--cover .fig-sub,
+.page--cover .fig-source { color: #8794a8; }
+.page--cover .chart-slot {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.04);
+  color: #9fb1cc;
+}
+.stat-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 6mm;
+  margin-top: auto;
+  padding-top: 5mm;
+  border-top: 0.3mm solid rgba(255, 255, 255, 0.25);
+}
+.stat-label { font-size: 6.8pt; letter-spacing: 0.14em; text-transform: uppercase; color: #8794a8; }
+.stat-value { margin-top: 1mm; font-size: 17pt; font-weight: 700; letter-spacing: -0.02em; }
+.stat-note { margin-top: 0.5mm; font-size: 7.5pt; color: #8794a8; }
+.cover-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8mm;
+  font-size: 7pt;
+  color: #8794a8;
+}
+
+/* ---------- Section titles and text ---------- */
+
+.section-title {
+  display: grid;
+  grid-template-columns: 13mm 1fr;
+  align-items: start;
+  margin-bottom: 5mm;
+}
+.section-title .num {
+  width: 9mm;
+  padding-top: 2.5mm;
+  border-top: 0.9mm solid var(--blue);
+  font-size: 10pt;
+  font-weight: 600;
+  color: var(--blue);
+}
+.section-title h2 { margin: 0; font-size: 22pt; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; }
+.section-title .sub { grid-column: 2; margin: 1.5mm 0 0; font-size: 10.5pt; color: var(--muted); }
+
+.lede { margin: 0 0 6mm; font-size: 12pt; line-height: 1.55; }
+
+.subhead {
+  margin: 0 0 3mm;
+  padding-left: 3mm;
+  border-left: 1mm solid var(--blue);
+  font-size: 10.5pt;
+  font-weight: 700;
+}
+.subhead--red { border-left-color: var(--neg); }
+
+.note { margin: 0 0 4mm; font-size: 7.5pt; line-height: 1.45; color: var(--faint); }
+
+.bullets { margin: 0 0 4mm; padding: 0; list-style: none; }
+.bullets li { position: relative; margin-bottom: 2.5mm; padding-left: 4.5mm; }
+.bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0.5mm;
+  top: 2mm;
+  width: 1.6mm;
+  height: 1.6mm;
+  border-radius: 50%;
+  background: var(--blue);
+}
+
+.cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; margin-bottom: 5mm; }
+.item { margin: 0 0 3mm; padding-bottom: 3mm; border-bottom: 0.2mm solid var(--rule); break-inside: avoid; }
+.item h4 { margin: 0 0 1mm; font-size: 9.6pt; }
+.item p { margin: 0; color: var(--muted); font-size: 8.8pt; }
+
+/* ---------- KPIs ---------- */
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 8mm;
+  margin-bottom: 6mm;
+  border-top: 0.5mm solid var(--ink);
+}
+.kpi-grid--2 { grid-template-columns: repeat(2, 1fr); }
+.kpi-grid--4 { grid-template-columns: repeat(4, 1fr); }
+.kpi-grid .kpi { padding: 3.5mm 0; border-bottom: 0.2mm solid var(--rule); }
+
+.kpi-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  column-gap: 8mm;
+  margin-bottom: 6mm;
+  padding: 3.5mm 0;
+  border-top: 0.5mm solid var(--ink);
+  border-bottom: 0.2mm solid var(--rule);
+}
+
+.kpi-label { font-size: 6.8pt; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.kpi-value { margin-top: 1mm; font-size: 19pt; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; }
+.kpi-value small { font-size: 8.5pt; font-weight: 400; letter-spacing: 0; color: var(--muted); }
+.kpi-note { margin-top: 0.5mm; font-size: 8pt; color: var(--muted); }
+
+/* ---------- Takeaways and cards ---------- */
+
+.takeaways { margin: 0 0 6mm; padding: 0; list-style: none; counter-reset: take; }
+.takeaways li { position: relative; margin-bottom: 3.2mm; padding-left: 9mm; counter-increment: take; break-inside: avoid; }
+.takeaways li::before {
+  content: counter(take);
+  position: absolute;
+  left: 0;
+  top: 0.4mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5.5mm;
+  height: 5.5mm;
+  border-radius: 50%;
+  background: var(--blue-soft);
+  color: var(--blue);
+  font-size: 7.5pt;
+  font-weight: 700;
+}
+
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; margin-bottom: 5mm; }
+.card {
+  padding: 5mm;
+  border: 0.25mm solid var(--rule);
+  border-radius: 3mm;
+  background: var(--card);
+  break-inside: avoid;
+}
+.card h3 { display: flex; align-items: center; gap: 2.5mm; margin: 0 0 3mm; font-size: 10.5pt; }
+.card h3::before {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5.5mm;
+  height: 5.5mm;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 6pt;
+  background: var(--blue);
+}
+.card--bull h3::before { content: "\25B2"; background: var(--blue); }
+.card--bear h3::before { content: "\25BC"; background: #e04848; }
+.card ul { margin: 0; padding: 0; list-style: none; font-size: 8.8pt; }
+.card li { position: relative; margin-bottom: 2.5mm; padding-left: 4.5mm; color: #2a2f38; }
+.card li::before {
+  content: "";
+  position: absolute;
+  left: 0.5mm;
+  top: 1.9mm;
+  width: 1.5mm;
+  height: 1.5mm;
+  border-radius: 50%;
+  background: var(--faint);
+}
+
+.callout {
+  margin: 0 0 5mm;
+  padding: 4mm 5mm;
+  border-left: 1mm solid var(--blue);
+  border-radius: 2mm;
+  background: var(--blue-soft);
+  break-inside: avoid;
+}
+.callout--neutral { border-left-color: var(--faint); background: var(--card); }
+.callout .callout-title { margin: 0 0 1.5mm; font-weight: 700; }
+.callout p:last-child { margin-bottom: 0; }
+
+.disclosure {
+  margin: 0 0 5mm;
+  padding: 4mm 5mm;
+  border: 0.25mm solid var(--rule);
+  border-radius: 3mm;
+  background: var(--card);
+  font-size: 8pt;
+  line-height: 1.5;
+  color: var(--muted);
+  break-inside: avoid;
+}
+.disclosure h3 { margin: 0 0 2mm; font-size: 9.6pt; color: var(--ink); }
+
+/* ---------- Tables ---------- */
+
+.data { width: 100%; margin: 0 0 4mm; border-collapse: collapse; font-size: 8.8pt; break-inside: avoid; }
+.data th {
+  padding: 2mm;
+  border-bottom: 0.5mm solid var(--ink);
+  font-size: 7pt;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-align: left;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.data td { padding: 2.3mm 2mm; border-bottom: 0.2mm solid var(--rule); }
+.data .num { text-align: right; font-variant-numeric: tabular-nums; }
+.data td.strong { font-weight: 700; }
+.data tr.total td { border-top: 0.4mm solid var(--ink); font-weight: 700; }
+
+/* ---------- Figures and chart slots ---------- */
+
+.figure { margin: 0 0 6mm; break-inside: avoid; }
+.figure-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; margin-bottom: 6mm; }
+.figure-row .figure { margin-bottom: 0; }
+
+.fig-label { font-size: 7pt; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue); }
+.fig-title { margin: 1mm 0 0; font-size: 11.5pt; font-weight: 700; }
+.fig-sub { margin: 0.5mm 0 3mm; font-size: 8.5pt; color: var(--muted); }
+.fig-source { margin: 2mm 0 0; font-size: 7.5pt; color: var(--faint); }
+
+/* A chart slot is an empty box with a fixed height, so layout does not move when the chart
+   is dropped in. Whatever fills the slot should also add the .chart-slot--filled class. */
+.chart-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  border: 0.3mm dashed #b9c4d6;
+  border-radius: 2mm;
+  background: #f5f8fc;
+  font-size: 7.5pt;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8794a8;
+}
+.chart-slot::before { content: "Chart \00B7  " attr(data-chart-id); }
+.chart-slot--filled { border: 0; background: none; }
+.chart-slot--filled::before { content: none; }
+.h-sm { height: 48mm; }
+.h-md { height: 68mm; }
+.h-lg { height: 88mm; }
+
+/* ---------- Timeline, glossary, sources ---------- */
+
+.timeline { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; margin-bottom: 5mm; }
+.t-row {
+  display: grid;
+  grid-template-columns: 17mm 1fr;
+  padding: 2mm 0;
+  border-bottom: 0.2mm solid var(--rule);
+  font-size: 8.8pt;
+  break-inside: avoid;
+}
+.t-date { font-weight: 700; color: var(--blue); }
+
+.glossary { margin: 0; }
+.glossary dt { margin: 0 0 0.5mm; font-weight: 700; }
+.glossary dd { margin: 0 0 2.5mm; padding-bottom: 2.5mm; border-bottom: 0.2mm solid var(--rule); font-size: 8.6pt; color: var(--muted); }
+
+.sources { margin: 0; padding: 0; list-style: none; columns: 2; column-gap: 8mm; counter-reset: src; }
+.sources li { position: relative; margin-bottom: 3mm; padding-left: 6mm; counter-increment: src; break-inside: avoid; font-size: 8.6pt; }
+.sources li::before { content: counter(src); position: absolute; left: 0; font-weight: 700; color: var(--blue); }
+.src-url { display: block; font-size: 7pt; color: var(--blue); word-break: break-all; }
+
+</style>
+</head>
+<body>
+<section class="page page--cover">
+  <div class="cover-top"><span class="label">Equity Research Report</span><span>November 5, 2026</span></div>
+  <h1 class="cover-ticker">ACME</h1>
+  <p class="cover-name">Acme Corp. <span>· NYSE</span></p>
+  <h2 class="cover-headline">A record year meets a cost squeeze</h2>
+  <p class="cover-lede">Sample layout text. Fiscal 2026 delivered the fastest growth in five years, but rising input costs now cloud the margin outlook for the holiday quarter and beyond.</p>
+  <figure class="figure">
+    <p class="fig-label">Month-end share price</p>
+    <div class="chart-slot h-lg" data-chart-id="price_history"></div>
+  </figure>
+  <div class="stat-strip">
+    <div><div class="stat-label">Last close</div><div class="stat-value">$100.00</div><div class="stat-note">Nov 4, 2026</div></div>
+    <div><div class="stat-label">Market value</div><div class="stat-value">$1.00T</div><div class="stat-note">10.00B shares</div></div>
+    <div><div class="stat-label">FY26 revenue</div><div class="stat-value">$50.0B</div><div class="stat-note">+15.0% YoY</div></div>
+    <div><div class="stat-label">FY26 EPS</div><div class="stat-value">$5.00</div><div class="stat-note">+20.0% YoY</div></div>
+  </div>
+  <div class="cover-foot"><span>Sector: Technology</span><span>Not investment advice. See disclosures on page 04.</span></div>
+</section>
+
+<section class="page">
+  <header class="page-head"><span><b>Acme Corp.</b> NYSE: ACME</span><span>Executive Summary</span><span>Equity Research · Nov 5, 2026</span></header>
+  <div class="section-title"><span class="num">01</span><h2>Executive Summary</h2><p class="sub">Where Acme stands after fiscal 2026, in one page.</p></div>
+  <p class="lede">Acme closed fiscal 2026 with its strongest growth in years: revenue rose <strong>15%</strong> to a record <strong>$50.0 billion</strong>. Management guided next-quarter gross margin to <strong>45–46%</strong>, down from 47.9%.</p>
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Last close</div><div class="kpi-value">$100.00</div><div class="kpi-note"><span class="pos">▲ 5.31%</span> on the day</div></div>
+    <div class="kpi"><div class="kpi-label">Market value</div><div class="kpi-value">$1.00T</div><div class="kpi-note">10.00B shares</div></div>
+    <div class="kpi"><div class="kpi-label">Valuation</div><div class="kpi-value">38.9× <small>TTM P/E</small></div><div class="kpi-note">Forward P/E 37.0×</div></div>
+  </div>
+  <h3 class="subhead">Key takeaways</h3>
+  <ol class="takeaways">
+    <li><strong>A record year, broadly earned.</strong> Product revenue grew 21% and every region grew.</li>
+    <li><strong>Q4 beat, but the mix shifted.</strong> Quarterly revenue topped estimates while services slowed.</li>
+    <li><strong>Margins are now the debate.</strong> The guide reflects costs management expects to keep rising.</li>
+  </ol>
+  <div class="cards">
+    <div class="card card--bull"><h3>The bull case</h3><ul><li>Pricing lifts average selling prices into a guided record quarter.</li><li>Installed base keeps services compounding.</li></ul></div>
+    <div class="card card--bear"><h3>The bear case</h3><ul><li>Costs described as unprecedented could compress margins.</li><li>Services growth decelerated in Q4.</li></ul></div>
+  </div>
+  <footer class="page-foot"><span>For informational and educational purposes only. Not investment advice.</span><span class="pageno">02</span></footer>
+</section>
+
+<section class="page">
+  <header class="page-head"><span><b>Acme Corp.</b> NYSE: ACME</span><span>Q4 Earnings Review</span><span>Equity Research · Nov 5, 2026</span></header>
+  <div class="section-title"><span class="num">02</span><h2>Q4 FY2026 Earnings Review</h2><p class="sub">Quarter ended September 26, 2026, reported November 2.</p></div>
+  <table class="data">
+    <thead><tr><th>Metric</th><th class="num">Q4 FY26</th><th class="num">Q4 FY25</th><th class="num">YoY</th><th class="num">Est.</th><th class="num">vs. Est.</th></tr></thead>
+    <tbody>
+      <tr><td>Revenue</td><td class="num strong">$114.5B</td><td class="num">$102.5B</td><td class="num pos">+11.7%</td><td class="num">$113.4B</td><td class="num pos">+1.0%</td></tr>
+      <tr><td>Diluted EPS</td><td class="num strong">$2.10</td><td class="num">$1.85</td><td class="num pos">+13.5%</td><td class="num">$1.99</td><td class="num pos">+5.5%</td></tr>
+      <tr><td>iPad-like segment</td><td class="num strong">$6.23B</td><td class="num">$6.95B</td><td class="num neg">−10.4%</td><td class="num">$6.83B</td><td class="num neg">−8.8%</td></tr>
+      <tr class="total"><td>Net income</td><td class="num">$30.71B</td><td class="num">$27.47B</td><td class="num pos">+11.8%</td><td class="num">–</td><td class="num">–</td></tr>
+    </tbody>
+  </table>
+  <p class="note">Sources: company filings; consensus from data providers.</p>
+  <div class="figure-row">
+    <figure class="figure"><p class="fig-label">Figure 1</p><p class="fig-title">Annual revenue</p><p class="fig-sub">USD billions, fiscal years</p><div class="chart-slot h-sm" data-chart-id="annual_revenue"></div><p class="fig-source">Source: company filings.</p></figure>
+    <figure class="figure"><p class="fig-label">Figure 2</p><p class="fig-title">Diluted EPS</p><p class="fig-sub">USD, fiscal years</p><div class="chart-slot h-sm" data-chart-id="annual_eps"></div><p class="fig-source">Source: company filings.</p></figure>
+  </div>
+  <figure class="figure"><p class="fig-label">Figure 3</p><p class="fig-title">Quarterly gross margin</p><p class="fig-sub">Reported, with guidance range</p><div class="chart-slot h-sm" data-chart-id="gross_margin"></div><p class="fig-source">Source: company filings.</p></figure>
+  <footer class="page-foot"><span>For informational and educational purposes only. Not investment advice.</span><span class="pageno">03</span></footer>
+</section>
+
+<section class="page">
+  <header class="page-head"><span><b>Acme Corp.</b> NYSE: ACME</span><span>Risks &amp; Dates</span><span>Equity Research · Nov 5, 2026</span></header>
+  <div class="section-title"><span class="num">03</span><h2>Catalysts, Risks &amp; Key Dates</h2><p class="sub">What could move the stock from here, in either direction.</p></div>
+    <div class="callout"><p class="callout-title">December-quarter outlook</p><p>Revenue growth of +7% to +10%; gross margin of 45% to 46%.</p></div>
+  <div class="cols-2">
+    <div><h3 class="subhead">Potential catalysts</h3><div class="item"><h4>Holiday-quarter delivery</h4><p>A print at the top of the guide would confirm demand.</p></div><div class="item"><h4>Product ramp</h4><p>Easing supply would expand the priciest product.</p></div></div>
+    <div><h3 class="subhead subhead--red">Key risks</h3><div class="item"><h4>Component inflation</h4><p>Costs keep rising and pressure margins.</p></div><div class="item"><h4>Valuation</h4><p>Shares are sensitive to any disappointment.</p></div></div>
+  </div>
+  <h3 class="subhead">2026 at a glance</h3>
+  <div class="timeline">
+    <div class="t-row"><span class="t-date">Feb 20</span><span>Court strikes down tariffs</span></div>
+    <div class="t-row"><span class="t-date">Sep 1</span><span>New CEO takes over</span></div>
+    <div class="t-row"><span class="t-date">Apr 30</span><span>Q2 beat; buyback authorized</span></div>
+    <div class="t-row"><span class="t-date">Nov 2</span><span>Q4 results</span></div>
+  </div>
+  <div class="disclosure"><h3>Important disclosures</h3><p>Sample disclosure text for layout only.</p></div>
+  <h3 class="subhead">Sources</h3>
+  <ol class="sources">
+    <li>Company Form 8-K: Q4 FY2026 results<span class="src-url">https://example.com/filings/8k-q4-2026</span></li>
+    <li>Example News: Company stock sinks as costs hurt profits<span class="src-url">https://example.com/news/2026/11/03/example</span></li>
+  </ol>
+  <footer class="page-foot"><span>For informational and educational purposes only. Not investment advice.</span><span class="pageno">04</span></footer>
+</section>
+</body>
+</html>
